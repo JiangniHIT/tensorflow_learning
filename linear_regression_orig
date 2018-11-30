@@ -1,0 +1,37 @@
+import tensorflow as tf
+import numpy as np
+
+tf.enable_eager_execution()
+
+X_raw=np.array([2013,2014,2015,2016,2017])
+y_raw=np.array([12000,14000,15000,16000,17500])
+
+X=(X_raw-X_raw.min())/(X_raw.max()-X_raw.min())
+y=(y_raw-y_raw.min())/(y_raw.max()-y_raw.min())
+
+X=tf.constant(X)
+y=tf.constant(y)
+
+a=tf.get_variable('a',dtype=tf.float64,shape=[],initializer=tf.zeros_initializer())
+b=tf.get_variable('b',dtype=tf.float64,shape=[],initializer=tf.zeros_initializer())
+variables=[a,b]
+
+num_epoch=10000
+
+#声明梯度下降的优化器
+optimizer=tf.train.GradientDescentOptimizer(learning_rate=1e-3)
+
+for e in range(num_epoch):
+    with tf.GradientTape() as tape:
+        y_pred=a*X+b
+        loss=0.5*tf.reduce_sum(tf.square(y_pred-y))
+        #自动计算损失函数关于自变量的梯度
+        grads=tape.gradient(loss,variables)
+        #自动根据梯度更新参数
+        optimizer.apply_gradients(grads_and_vars=zip(grads,variables))
+        
+print(variables)
+
+
+###
+X,y归一化以后变为64位，float64，而刚开始变量a和b是float32，所以直接将a与X相乘求预测函数，结果会出现类型不匹配的问题
