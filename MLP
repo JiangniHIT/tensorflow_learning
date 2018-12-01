@@ -12,20 +12,20 @@ class DataLoader():
         index=np.random.randint(0,np.shape(self.train_data)[0],batch_size)
         return self.train_data[index,:],self.train_labels[index]
     
-class MLP(tf.keras.Model):
+class MLP(tf.keras.Model):   #定义模型类
     def __init__(self):
         super().__init__()
-        self.dense1=tf.keras.layers.Dense(units=100,activation=tf.nn.relu)
-        self.dense2=tf.keras.layers.Dense(units=10)
+        self.dense1=tf.keras.layers.Dense(units=100,activation=tf.nn.relu)    #定义输出为100维的全连接层
+        self.dense2=tf.keras.layers.Dense(units=10)   #输出10维信号，分别代表0-9的概率
         
     def call(self,inputs):
         x=self.dense1(inputs)
         x=self.dense2(x)
         return x
     
-    def predict(self,inputs):
+    def predict(self,inputs):   #对图片对应的数字进行预测
         logits=self(inputs)
-        return tf.argmax(logits,axis=-1)
+        return tf.argmax(logits,axis=-1)   #选择概率最大的数字进行预测输出
     
 #定义一些模型超参数
 num_batches=1000
