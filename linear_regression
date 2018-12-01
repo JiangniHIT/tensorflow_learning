@@ -30,3 +30,39 @@ print(model.variables)
 array([[0.40784496],
        [1.191065  ],
        [1.9742855 ]], dtype=float32)>, <tf.Variable 'linear/dense/bias:0' shape=(1,) dtype=float32, numpy=array([0.78322077], dtype=float32)>]
+
+###在编写模型的稍加注意，都是可以兼容Eager Execution模式和Graph Execution 模式的，
+###在Graph Execution模式下，model（input_tensor)只需运行一次以完成图的建立操作
+import tensorflow as tf
+import numpy as np
+#tf.enable_eager_execution()
+
+X=tf.constant([[1.,2.,3.],[4.,5.,6.]])
+y=tf.constant([[10.],[20.]])
+
+class Linear(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+        self.dense=tf.keras.layers.Dense(units=1,kernel_initializer=tf.zeros_initializer(),
+                                         bias_initializer=tf.zeros_initializer())
+        
+    def call(self,input):
+        output=self.dense(input)
+        return output
+    
+model=Linear()
+optimizer=tf.train.GradientDescentOptimizer(learning_rate=0.01)
+X_placeholder=tf.placeholder(name='X',shape=[None,3],dtype=tf.float32)
+y_placeholder=tf.placeholder(name='y',shape=[None,1],dtype=tf.float32)
+y_pred=model(X_placeholder)
+loss=tf.reduce_mean(tf.square(y_pred-y_placeholder))
+train_op=optimizer.minimize(loss)
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    X=X.eval(session=sess)  ##将tensor转化为numpy数组
+    y=y.eval(session=sess)   ##将tensor转化为numpy数组
+    for i in range(1000):
+        sess.run(train_op,feed_dict={X_placeholder:X,y_placeholder:y})
+    print(sess.run(model.variables))
+    
