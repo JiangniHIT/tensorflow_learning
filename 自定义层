@@ -1,0 +1,41 @@
+###我们不仅可以继承tf.keras.Model编写自己的模型类，也可以继承tf.keras.layers.Layer编写自己的层
+
+class MyLayer(tf.keras.layers.Layer):
+    def __init__(self):
+        super().__init__()
+        #初始化代码
+        
+    def build(self,input_shape):
+        ##input_shape：提供输入的形状
+        ##在第一次使用该层的时候调用该部分代码，在这里创建变量可以使得变量的形状自适应输入的形状
+        ##而不需要使用者额外指定变量形状
+        ##如果已经可以完全确定变量的形状，也可以在__init__部分创建变量
+        self.variable_0=self.add_variable(...)
+        self.variable_1=self.add_variable(...)
+        
+    def call(self,input):
+        ##模型调用的代码，处理输入并返回输出
+        return output
+    
+###如果要实现一个全连接层，但指定输出维度为1，可以按如下方式自定义：
+class LinearLayer(tf.keras.layers.Layer):
+    def __init__(self):
+        super().__init__()
+        
+    def build(self,input_shape):
+        self.w=self.add_variable(name='w',shape=[input_shape[-1],1],initializer=tf.zeros_initializer())
+        self.b=self.add_variable(name='b',shape=[1],initializer=tf.zeros_initializer())
+        
+    def call(self,x):
+        y_pred=tf.matmul(x,self.w)+self.b
+        return y_pred
+    
+##使用相同的方式，可以调用我们自定义的层LinearLayer()
+class Linear(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+        self.layer=LinearLayer()
+        
+    def call(self,input):
+        output=self.layer(input)
+        return output
