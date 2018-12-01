@@ -18,8 +18,8 @@ class CNN(tf.keras.Model):
         )
         self.pool2=tf.keras.layers.MaxPool2D(pool_size=[2,2],strides=2)  #现在图片尺寸减小到7*7
         self.flatten=tf.keras.layers.Reshape(target_shape=(7*7*64,))  #将池化层输出的张量reshape成一些向量
-        self.dense=tf.keras.layers.dense(units=1024,avtivation=tf.nn.relu)  #全连接层
-        self.dense=tf.keras.layers.dense(units=10)
+        self.dense1=tf.keras.layers.Dense(units=1024,avtivation=tf.nn.relu)  #全连接层
+        self.dense2=tf.keras.layers.Dense(units=10)
         
     def call(self,inputs):
         inputs=tf.reshape(inputs,[-1,28,28,1])
